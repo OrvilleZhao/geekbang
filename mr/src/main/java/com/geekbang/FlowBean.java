@@ -1,5 +1,7 @@
 package com.geekbang;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.hadoop.io.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;

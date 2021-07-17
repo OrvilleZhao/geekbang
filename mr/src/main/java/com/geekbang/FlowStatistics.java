@@ -6,18 +6,23 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.WritableComparable;
+import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class App implements Tool{
-    public static final Logger log=LoggerFactory.getLogger(App.class);
-    Configuration configuration;
-    public static class MyMap extends Mapper<Object, Text, Text, Writable>{
+public class FlowStatistics {
+
+    public static class doMapper extends Mapper<Object, Text, FlowKey, Writable>{
         @Override
         protected void map(Object key, Text value, Context context)  throws IOException, InterruptedException {
             String phoneInfo = value.toString();//将输入的纯文本的数据转换成String
@@ -36,42 +41,43 @@ public class App implements Tool{
                 String revPackage = tokenizer.nextToken();//接包数
                 long upFlow = Long.parseLong(tokenizer.nextToken());//上行/传流量
                 long downFlow = Long.parseLong(tokenizer.nextToken());//下行/传流量
-                Text phone = new Text(phoneNum);
+                FlowKey phone = new FlowKey(phoneNum);
                 FlowBean flowBean = new FlowBean(upFlow, downFlow);
                 context.write(phone,flowBean);
             }
         }
     }
 
-    public static class MyReduce extends Reducer<Text, Writable, Text, IntWritable>{
- 
+    public static class doReducer extends Reducer<FlowKey, Writable, FlowKey, IntWritable>{
         @Override
-        protected void reduce(Text key, Iterable<Writable> values,Context context)
+        protected void reduce(FlowKey key, Iterable<Writable> values,Context context)
                 throws IOException, InterruptedException {
-            int sum=0;
-            Iterator<Writable> iterator =  values.iterator();
-            while(iterator.hasNext()){
-                FlowBean flowBean = ((FlowBean) iterator.next());//计算总分
+            int sum = 0;
+            for(Writable value:values){
+                FlowBean flowBean =  (FlowBean) value;
                 sum += flowBean.getSumFlow();
             }
-            context.write(key,new IntWritable(sum));//输出学生姓名和平均值
+            context.write(key, new IntWritable(sum));
         }
-        
     }
 
-    @Override
-    public Configuration getConf() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    @Override
-    public void setConf(Configuration arg0) {
-        // TODO Auto-generated method stub
-        
-    }
-    @Override
-    public int run(String[] arg0) throws Exception {
-        // TODO Auto-generated method stub
-        return 0;
+    public static void main(String[] args) throws IOException, ClassNotFoundException,InterruptedException {
+        Job job = Job.getInstance();
+        job.setJobName("iphonestatistics");
+        Path in = new Path("hdfs://localhost:9000/user/orville/input/HTTP_20130313143750.dat");
+        Path out = new Path("hdfs://localhost:9000/user/orville/output/out");
+
+        FileInputFormat.addInputPath(job, in);
+        FileOutputFormat.setOutputPath(job, out);
+
+        job.setJarByClass(FlowStatistics.class);
+
+        job.setMapperClass(doMapper.class);
+        job.setReducerClass(doReducer.class);
+
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(IntWritable.class);
+        System.exit(job.waitForCompletion(true)?0:1);
+        System.out.println("end");
     }
 }
