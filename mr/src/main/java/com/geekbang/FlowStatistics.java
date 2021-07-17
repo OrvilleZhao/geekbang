@@ -22,8 +22,7 @@ import org.slf4j.LoggerFactory;
 
 public class FlowStatistics {
 
-    public static class doMapper extends Mapper<Object, Text, FlowKey, Writable>{
-        @Override
+    public static class doMapper extends Mapper<Object, Text, FlowKey, FlowBean>{
         protected void map(Object key, Text value, Context context)  throws IOException, InterruptedException {
             String phoneInfo = value.toString();//将输入的纯文本的数据转换成String
 			//将输入的数据先按行进行分割
@@ -43,29 +42,34 @@ public class FlowStatistics {
                 long downFlow = Long.parseLong(tokenizer.nextToken());//下行/传流量
                 FlowKey phone = new FlowKey(phoneNum);
                 FlowBean flowBean = new FlowBean(upFlow, downFlow);
-                context.write(phone,flowBean);
+                //IntWritable flowsum = new IntWritable((int) flowBean.getSumFlow());
+                context.write(phone, flowBean);
             }
         }
     }
 
-    public static class doReducer extends Reducer<FlowKey, Writable, FlowKey, IntWritable>{
+    public static class doReducer extends Reducer<FlowKey, FlowBean, FlowKey, FlowBean>{
         @Override
-        protected void reduce(FlowKey key, Iterable<Writable> values,Context context)
+        protected void reduce(FlowKey key, Iterable<FlowBean> values,Context context)
                 throws IOException, InterruptedException {
-            int sum = 0;
-            for(Writable value:values){
-                FlowBean flowBean =  (FlowBean) value;
-                sum += flowBean.getSumFlow();
+            long upflow = 0;
+            long downflow = 0;
+            long sumFlow = 0;
+            for(FlowBean value:values){
+                upflow += value.getUpFlow();
+                downflow += value.getDownFlow();
             }
-            context.write(key, new IntWritable(sum));
+            FlowBean result = new FlowBean(upflow, downflow);
+            context.write(key, result);
         }
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException,InterruptedException {
+        System.out.println("start");
         Job job = Job.getInstance();
-        job.setJobName("iphonestatistics");
-        Path in = new Path("hdfs://localhost:9000/user/orville/input/HTTP_20130313143750.dat");
-        Path out = new Path("hdfs://localhost:9000/user/orville/output/out");
+        job.setJobName("OrvilleJob");
+        Path in = new Path("hdfs://47.101.206.249:8020/user/student/orville/input/HTTP_20130313143750.dat");
+        Path out = new Path("hdfs://47.101.206.249:8020/user/student/orville/output");
 
         FileInputFormat.addInputPath(job, in);
         FileOutputFormat.setOutputPath(job, out);
@@ -74,9 +78,10 @@ public class FlowStatistics {
 
         job.setMapperClass(doMapper.class);
         job.setReducerClass(doReducer.class);
-
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(IntWritable.class);
+        job.setMapOutputKeyClass(FlowKey.class);
+        job.setMapOutputValueClass(FlowBean.class);
+        job.setOutputKeyClass(FlowKey.class);
+        job.setOutputValueClass(FlowBean.class);
         System.exit(job.waitForCompletion(true)?0:1);
         System.out.println("end");
     }

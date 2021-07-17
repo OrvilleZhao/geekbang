@@ -12,6 +12,10 @@ import java.nio.charset.CharacterCodingException;
 public class FlowKey implements WritableComparable<FlowKey> {
     private Text iphone;
 
+    public FlowKey() {
+        this.iphone = new Text("test");
+    }
+
     public FlowKey(String str) {
         this.iphone = new Text(str);
     }
@@ -36,5 +40,10 @@ public class FlowKey implements WritableComparable<FlowKey> {
     @Override
     public void readFields(DataInput dataInput) throws IOException {
         this.iphone.readFields(dataInput);
+    }
+
+    @Override
+    public String toString() {
+        return this.iphone.toString();
     }
 }
