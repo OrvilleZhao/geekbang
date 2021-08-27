@@ -12,8 +12,9 @@ import java.util.List;
 
 public class OptionParser {
 
+    private static final Options cliOptions = new Options();
+
     public static DistCpOptions parse(String args[]) {
-        Options cliOptions = new Options();
         cliOptions.addOption("i", false, "Ignore failures during copy");
         cliOptions.addOption("m", true, "Max number of concurrent maps to use for copy");
         CommandLineParser parser = new GnuParser();
@@ -50,10 +51,11 @@ public class OptionParser {
             Integer maps = Integer.parseInt(optionValue);
             option.setMaxMaps(maps);
         }
+        return option;
+    }
 
-
-
-
-        return null;
+    public static void usage() {
+        HelpFormatter formatter = new HelpFormatter();
+        formatter.printHelp("distcp OPTIONS [source_path...] <target_path>\n\nOPTIONS", cliOptions);
     }
 }

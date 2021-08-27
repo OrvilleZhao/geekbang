@@ -64,7 +64,6 @@
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-hdfs</artifactId>
       <version>2.7.1</version>
-      <type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
@@ -74,8 +73,8 @@
     </dependency>
   </dependencies>
   <build>
-    <sourceDirectory>src/main/java/com/orville</sourceDirectory>
-        <testSourceDirectory>src/test/java/com/orville</testSourceDirectory>
+    <sourceDirectory>src/main/com/orville</sourceDirectory>
+        <testSourceDirectory>src/test/main/com/orville</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
