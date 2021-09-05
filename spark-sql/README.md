@@ -610,3 +610,6 @@ Total time of effective runs: 0.064291595 seconds
 !      +- Project [id#35, name#36]                                                                                                                                     +- Filter (NOT coalesce(id#35 IN (1,2), false) AND (name#36 = tom))
           +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]            +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
 ```
+
+# 作业3
+见homework3/src/main/scala/MyPushDown
