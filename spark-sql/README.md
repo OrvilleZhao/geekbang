@@ -1,4 +1,4 @@
-# 作业1:为Spark SQL添加一条自定义命令
+#作业1:为Spark SQL添加一条自定义命令
 1.SqlBase.g4添加相关参数
 <img src="img/img2.jpg" />
 
@@ -357,3 +357,5 @@ tom
 Time taken: 0.4 seconds, Fetched 1 row(s)
 ```
 
+=======
+>>>>>>> 20ea0ec2f63a29a380ee43f5df30096d84d537df
