@@ -356,6 +356,257 @@ Total time of effective runs: 0.0 seconds
 tom
 Time taken: 0.4 seconds, Fetched 1 row(s)
 ```
+SQL2
+```
+select id,name, 'yes' as t from (select id,name from test where 1=1  except select id,name from test where id in (1,2) ) where name = 'tom' order by t;
+```
 
-=======
->>>>>>> 20ea0ec2f63a29a380ee43f5df30096d84d537df
+```
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch Substitution has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch Disable Hints has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch Hints has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch Simple Sanity Check has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Applying Rule org.apache.spark.sql.catalyst.analysis.Analyzer$ResolveRelations ===
+ 'Sort ['t ASC NULLS FIRST], true                             'Sort ['t ASC NULLS FIRST], true
+ +- 'Project ['id, 'name, yes AS t#34]                        +- 'Project ['id, 'name, yes AS t#34]
+    +- 'Filter ('name = tom)                                     +- 'Filter ('name = tom)
+       +- 'SubqueryAlias __auto_generated_subquery_name             +- 'SubqueryAlias __auto_generated_subquery_name
+          +- 'Except false                                             +- 'Except false
+             :- 'Project ['id, 'name]                                     :- 'Project ['id, 'name]
+             :  +- 'Filter (1 = 1)                                        :  +- 'Filter (1 = 1)
+!            :     +- 'UnresolvedRelation [test], [], false               :     +- 'SubqueryAlias spark_catalog.default.test
+!            +- 'Project ['id, 'name]                                     :        +- 'UnresolvedCatalogRelation `default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, [], false
+!               +- 'Filter 'id IN (1,2)                                   +- 'Project ['id, 'name]
+!                  +- 'UnresolvedRelation [test], [], false                  +- 'Filter 'id IN (1,2)
+!                                                                               +- 'SubqueryAlias spark_catalog.default.test
+!                                                                                  +- 'UnresolvedCatalogRelation `default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, [], false
+
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Applying Rule org.apache.spark.sql.execution.datasources.FindDataSourceTable ===
+ 'Sort ['t ASC NULLS FIRST], true                                                                                                     'Sort ['t ASC NULLS FIRST], true
+ +- 'Project ['id, 'name, yes AS t#34]                                                                                                +- 'Project ['id, 'name, yes AS t#34]
+    +- 'Filter ('name = tom)                                                                                                             +- 'Filter ('name = tom)
+       +- 'SubqueryAlias __auto_generated_subquery_name                                                                                     +- 'SubqueryAlias __auto_generated_subquery_name
+          +- 'Except false                                                                                                                     +- 'Except false
+             :- 'Project ['id, 'name]                                                                                                             :- 'Project ['id, 'name]
+!            :  +- 'Filter (1 = 1)                                                                                                                :  +- Filter (1 = 1)
+!            :     +- 'SubqueryAlias spark_catalog.default.test                                                                                   :     +- SubqueryAlias spark_catalog.default.test
+!            :        +- 'UnresolvedCatalogRelation `default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, [], false               :        +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+             +- 'Project ['id, 'name]                                                                                                             +- 'Project ['id, 'name]
+                +- 'Filter 'id IN (1,2)                                                                                                              +- 'Filter 'id IN (1,2)
+!                  +- 'SubqueryAlias spark_catalog.default.test                                                                                         +- SubqueryAlias spark_catalog.default.test
+!                     +- 'UnresolvedCatalogRelation `default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, [], false                        +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#38, name#39, tel#40], Partition Cols: []]
+
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Applying Rule org.apache.spark.sql.catalyst.analysis.Analyzer$ResolveReferences ===
+!'Sort ['t ASC NULLS FIRST], true                                                                                                                                            Sort [t#34 ASC NULLS FIRST], true
+!+- 'Project ['id, 'name, yes AS t#34]                                                                                                                                       +- Project [id#35, name#36, yes AS t#34]
+!   +- 'Filter ('name = tom)                                                                                                                                                    +- Filter (name#36 = tom)
+!      +- 'SubqueryAlias __auto_generated_subquery_name                                                                                                                            +- SubqueryAlias __auto_generated_subquery_name
+!         +- 'Except false                                                                                                                                                            +- Except false
+!            :- 'Project ['id, 'name]                                                                                                                                                    :- Project [id#35, name#36]
+             :  +- Filter (1 = 1)                                                                                                                                                        :  +- Filter (1 = 1)
+             :     +- SubqueryAlias spark_catalog.default.test                                                                                                                           :     +- SubqueryAlias spark_catalog.default.test
+             :        +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]               :        +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+!            +- 'Project ['id, 'name]                                                                                                                                                    +- Project [id#38, name#39]
+!               +- 'Filter 'id IN (1,2)                                                                                                                                                     +- Filter id#38 IN (1,2)
+                   +- SubqueryAlias spark_catalog.default.test                                                                                                                                 +- SubqueryAlias spark_catalog.default.test
+                      +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#38, name#39, tel#40], Partition Cols: []]                        +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#38, name#39, tel#40], Partition Cols: []]
+
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Result of Batch Resolution ===
+!'Sort ['t ASC NULLS FIRST], true                             Sort [t#34 ASC NULLS FIRST], true
+!+- 'Project ['id, 'name, yes AS t#34]                        +- Project [id#35, name#36, yes AS t#34]
+!   +- 'Filter ('name = tom)                                     +- Filter (name#36 = tom)
+!      +- 'SubqueryAlias __auto_generated_subquery_name             +- SubqueryAlias __auto_generated_subquery_name
+!         +- 'Except false                                             +- Except false
+!            :- 'Project ['id, 'name]                                     :- Project [id#35, name#36]
+!            :  +- 'Filter (1 = 1)                                        :  +- Filter (1 = 1)
+!            :     +- 'UnresolvedRelation [test], [], false               :     +- SubqueryAlias spark_catalog.default.test
+!            +- 'Project ['id, 'name]                                     :        +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+!               +- 'Filter 'id IN (1,2)                                   +- Project [id#38, name#39]
+!                  +- 'UnresolvedRelation [test], [], false                  +- Filter id#38 IN (1,2)
+!                                                                               +- SubqueryAlias spark_catalog.default.test
+!                                                                                  +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#38, name#39, tel#40], Partition Cols: []]
+
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch Remove TempResolvedColumn has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch Apply Char Padding has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch Post-Hoc Resolution has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch Remove Unresolved Hints has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch Nondeterministic has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch UDF has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch UpdateNullability has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch Subquery has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Applying Rule org.apache.spark.sql.catalyst.analysis.CleanupAliases ===
+ Sort [t#34 ASC NULLS FIRST], true                                                                                                                                           Sort [t#34 ASC NULLS FIRST], true
+ +- Project [id#35, name#36, yes AS t#34]                                                                                                                                    +- Project [id#35, name#36, yes AS t#34]
+    +- Filter (name#36 = tom)                                                                                                                                                   +- Filter (name#36 = tom)
+       +- SubqueryAlias __auto_generated_subquery_name                                                                                                                             +- SubqueryAlias __auto_generated_subquery_name
+          +- Except false                                                                                                                                                             +- Except false
+             :- Project [id#35, name#36]                                                                                                                                                 :- Project [id#35, name#36]
+             :  +- Filter (1 = 1)                                                                                                                                                        :  +- Filter (1 = 1)
+             :     +- SubqueryAlias spark_catalog.default.test                                                                                                                           :     +- SubqueryAlias spark_catalog.default.test
+             :        +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]               :        +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+             +- Project [id#38, name#39]                                                                                                                                                 +- Project [id#38, name#39]
+                +- Filter id#38 IN (1,2)                                                                                                                                                    +- Filter id#38 IN (1,2)
+                   +- SubqueryAlias spark_catalog.default.test                                                                                                                                 +- SubqueryAlias spark_catalog.default.test
+                      +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#38, name#39, tel#40], Partition Cols: []]                        +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#38, name#39, tel#40], Partition Cols: []]
+
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Result of Batch Cleanup ===
+ Sort [t#34 ASC NULLS FIRST], true                                                                                                                                           Sort [t#34 ASC NULLS FIRST], true
+ +- Project [id#35, name#36, yes AS t#34]                                                                                                                                    +- Project [id#35, name#36, yes AS t#34]
+    +- Filter (name#36 = tom)                                                                                                                                                   +- Filter (name#36 = tom)
+       +- SubqueryAlias __auto_generated_subquery_name                                                                                                                             +- SubqueryAlias __auto_generated_subquery_name
+          +- Except false                                                                                                                                                             +- Except false
+             :- Project [id#35, name#36]                                                                                                                                                 :- Project [id#35, name#36]
+             :  +- Filter (1 = 1)                                                                                                                                                        :  +- Filter (1 = 1)
+             :     +- SubqueryAlias spark_catalog.default.test                                                                                                                           :     +- SubqueryAlias spark_catalog.default.test
+             :        +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]               :        +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+             +- Project [id#38, name#39]                                                                                                                                                 +- Project [id#38, name#39]
+                +- Filter id#38 IN (1,2)                                                                                                                                                    +- Filter id#38 IN (1,2)
+                   +- SubqueryAlias spark_catalog.default.test                                                                                                                                 +- SubqueryAlias spark_catalog.default.test
+                      +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#38, name#39, tel#40], Partition Cols: []]                        +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#38, name#39, tel#40], Partition Cols: []]
+
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch HandleAnalysisOnlyCommand has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Metrics of Executed Rules ===
+Total number of runs: 187
+Total time: 0.078240584 seconds
+Total number of effective runs: 4
+Total time of effective runs: 0.064291595 seconds
+
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch Eliminate Distinct has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Applying Rule org.apache.spark.sql.catalyst.analysis.EliminateSubqueryAliases ===
+ Sort [t#34 ASC NULLS FIRST], true                                                                                                                                           Sort [t#34 ASC NULLS FIRST], true
+ +- Project [id#35, name#36, yes AS t#34]                                                                                                                                    +- Project [id#35, name#36, yes AS t#34]
+    +- Filter (name#36 = tom)                                                                                                                                                   +- Filter (name#36 = tom)
+!      +- SubqueryAlias __auto_generated_subquery_name                                                                                                                             +- Except false
+!         +- Except false                                                                                                                                                             :- Project [id#35, name#36]
+!            :- Project [id#35, name#36]                                                                                                                                              :  +- Filter (1 = 1)
+!            :  +- Filter (1 = 1)                                                                                                                                                     :     +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+!            :     +- SubqueryAlias spark_catalog.default.test                                                                                                                        +- Project [id#38, name#39]
+!            :        +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]               +- Filter id#38 IN (1,2)
+!            +- Project [id#38, name#39]                                                                                                                                                    +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#38, name#39, tel#40], Partition Cols: []]
+!               +- Filter id#38 IN (1,2)
+!                  +- SubqueryAlias spark_catalog.default.test
+!                     +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#38, name#39, tel#40], Partition Cols: []]
+
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Result of Batch Finish Analysis ===
+ Sort [t#34 ASC NULLS FIRST], true                                                                                                                                           Sort [t#34 ASC NULLS FIRST], true
+ +- Project [id#35, name#36, yes AS t#34]                                                                                                                                    +- Project [id#35, name#36, yes AS t#34]
+    +- Filter (name#36 = tom)                                                                                                                                                   +- Filter (name#36 = tom)
+!      +- SubqueryAlias __auto_generated_subquery_name                                                                                                                             +- Except false
+!         +- Except false                                                                                                                                                             :- Project [id#35, name#36]
+!            :- Project [id#35, name#36]                                                                                                                                              :  +- Filter (1 = 1)
+!            :  +- Filter (1 = 1)                                                                                                                                                     :     +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+!            :     +- SubqueryAlias spark_catalog.default.test                                                                                                                        +- Project [id#38, name#39]
+!            :        +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]               +- Filter id#38 IN (1,2)
+!            +- Project [id#38, name#39]                                                                                                                                                    +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#38, name#39, tel#40], Partition Cols: []]
+!               +- Filter id#38 IN (1,2)
+!                  +- SubqueryAlias spark_catalog.default.test
+!                     +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#38, name#39, tel#40], Partition Cols: []]
+
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch Union has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch OptimizeLimitZero has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch LocalRelation early has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch Pullup Correlated Expressions has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch Subquery has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Applying Rule org.apache.spark.sql.catalyst.optimizer.ReplaceExceptWithFilter ===
+ Sort [t#34 ASC NULLS FIRST], true                                                                                                                                     Sort [t#34 ASC NULLS FIRST], true
+ +- Project [id#35, name#36, yes AS t#34]                                                                                                                              +- Project [id#35, name#36, yes AS t#34]
+    +- Filter (name#36 = tom)                                                                                                                                             +- Filter (name#36 = tom)
+!      +- Except false                                                                                                                                                       +- Distinct
+!         :- Project [id#35, name#36]                                                                                                                                           +- Filter NOT coalesce(id#35 IN (1,2), false)
+!         :  +- Filter (1 = 1)                                                                                                                                                     +- Project [id#35, name#36]
+!         :     +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]                  +- Filter (1 = 1)
+!         +- Project [id#38, name#39]                                                                                                                                                    +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+!            +- Filter id#38 IN (1,2)
+!               +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#38, name#39, tel#40], Partition Cols: []]
+
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Applying Rule org.apache.spark.sql.catalyst.optimizer.ReplaceDistinctWithAggregate ===
+ Sort [t#34 ASC NULLS FIRST], true                                                                                                                                        Sort [t#34 ASC NULLS FIRST], true
+ +- Project [id#35, name#36, yes AS t#34]                                                                                                                                 +- Project [id#35, name#36, yes AS t#34]
+    +- Filter (name#36 = tom)                                                                                                                                                +- Filter (name#36 = tom)
+!      +- Distinct                                                                                                                                                              +- Aggregate [id#35, name#36], [id#35, name#36]
+          +- Filter NOT coalesce(id#35 IN (1,2), false)                                                                                                                            +- Filter NOT coalesce(id#35 IN (1,2), false)
+             +- Project [id#35, name#36]                                                                                                                                              +- Project [id#35, name#36]
+                +- Filter (1 = 1)                                                                                                                                                        +- Filter (1 = 1)
+                   +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]                     +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Result of Batch Replace Operators ===
+ Sort [t#34 ASC NULLS FIRST], true                                                                                                                                     Sort [t#34 ASC NULLS FIRST], true
+ +- Project [id#35, name#36, yes AS t#34]                                                                                                                              +- Project [id#35, name#36, yes AS t#34]
+    +- Filter (name#36 = tom)                                                                                                                                             +- Filter (name#36 = tom)
+!      +- Except false                                                                                                                                                       +- Aggregate [id#35, name#36], [id#35, name#36]
+!         :- Project [id#35, name#36]                                                                                                                                           +- Filter NOT coalesce(id#35 IN (1,2), false)
+!         :  +- Filter (1 = 1)                                                                                                                                                     +- Project [id#35, name#36]
+!         :     +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]                  +- Filter (1 = 1)
+!         +- Project [id#38, name#39]                                                                                                                                                    +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+!            +- Filter id#38 IN (1,2)
+!               +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#38, name#39, tel#40], Partition Cols: []]
+
+21/09/06 00:37:54 WARN PlanChangeLogger: Batch Aggregate has no effect.
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Applying Rule org.apache.spark.sql.catalyst.optimizer.PushDownPredicates ===
+ Sort [t#34 ASC NULLS FIRST], true                                                                                                                                        Sort [t#34 ASC NULLS FIRST], true
+ +- Project [id#35, name#36, yes AS t#34]                                                                                                                                 +- Project [id#35, name#36, yes AS t#34]
+!   +- Filter (name#36 = tom)                                                                                                                                                +- Aggregate [id#35, name#36], [id#35, name#36]
+!      +- Aggregate [id#35, name#36], [id#35, name#36]                                                                                                                          +- Filter (NOT coalesce(id#35 IN (1,2), false) AND (name#36 = tom))
+!         +- Filter NOT coalesce(id#35 IN (1,2), false)                                                                                                                            +- Project [id#35, name#36]
+!            +- Project [id#35, name#36]                                                                                                                                              +- Filter (1 = 1)
+!               +- Filter (1 = 1)                                                                                                                                                        +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+!                  +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Applying Rule org.apache.spark.sql.catalyst.optimizer.CollapseProject ===
+ Sort [t#34 ASC NULLS FIRST], true                                                                                                                                     Sort [t#34 ASC NULLS FIRST], true
+!+- Project [id#35, name#36, yes AS t#34]                                                                                                                              +- Aggregate [id#35, name#36], [id#35, name#36, yes AS t#34]
+!   +- Aggregate [id#35, name#36], [id#35, name#36]                                                                                                                       +- Filter (NOT coalesce(id#35 IN (1,2), false) AND (name#36 = tom))
+!      +- Filter (NOT coalesce(id#35 IN (1,2), false) AND (name#36 = tom))                                                                                                   +- Project [id#35, name#36]
+!         +- Project [id#35, name#36]                                                                                                                                           +- Filter (1 = 1)
+!            +- Filter (1 = 1)                                                                                                                                                     +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+!               +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Applying Rule org.apache.spark.sql.catalyst.optimizer.FoldablePropagation ===
+!Sort [t#34 ASC NULLS FIRST], true                                                                                                                                  Sort [yes ASC NULLS FIRST], true
+ +- Aggregate [id#35, name#36], [id#35, name#36, yes AS t#34]                                                                                                       +- Aggregate [id#35, name#36], [id#35, name#36, yes AS t#34]
+    +- Filter (NOT coalesce(id#35 IN (1,2), false) AND (name#36 = tom))                                                                                                +- Filter (NOT coalesce(id#35 IN (1,2), false) AND (name#36 = tom))
+       +- Project [id#35, name#36]                                                                                                                                        +- Project [id#35, name#36]
+          +- Filter (1 = 1)                                                                                                                                                  +- Filter (1 = 1)
+             +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]               +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Applying Rule org.apache.spark.sql.catalyst.optimizer.ConstantFolding ===
+ Sort [yes ASC NULLS FIRST], true                                                                                                                                   Sort [yes ASC NULLS FIRST], true
+ +- Aggregate [id#35, name#36], [id#35, name#36, yes AS t#34]                                                                                                       +- Aggregate [id#35, name#36], [id#35, name#36, yes AS t#34]
+    +- Filter (NOT coalesce(id#35 IN (1,2), false) AND (name#36 = tom))                                                                                                +- Filter (NOT coalesce(id#35 IN (1,2), false) AND (name#36 = tom))
+       +- Project [id#35, name#36]                                                                                                                                        +- Project [id#35, name#36]
+!         +- Filter (1 = 1)                                                                                                                                                  +- Filter true
+             +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]               +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Applying Rule org.apache.spark.sql.catalyst.optimizer.PruneFilters ===
+ Sort [yes ASC NULLS FIRST], true                                                                                                                                   Sort [yes ASC NULLS FIRST], true
+ +- Aggregate [id#35, name#36], [id#35, name#36, yes AS t#34]                                                                                                       +- Aggregate [id#35, name#36], [id#35, name#36, yes AS t#34]
+    +- Filter (NOT coalesce(id#35 IN (1,2), false) AND (name#36 = tom))                                                                                                +- Filter (NOT coalesce(id#35 IN (1,2), false) AND (name#36 = tom))
+       +- Project [id#35, name#36]                                                                                                                                        +- Project [id#35, name#36]
+!         +- Filter true                                                                                                                                                     +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+!            +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+
+21/09/06 00:37:54 WARN PlanChangeLogger:
+=== Applying Rule org.apache.spark.sql.catalyst.optimizer.PushDownPredicates ===
+ Sort [yes ASC NULLS FIRST], true                                                                                                                                Sort [yes ASC NULLS FIRST], true
+ +- Aggregate [id#35, name#36], [id#35, name#36, yes AS t#34]                                                                                                    +- Aggregate [id#35, name#36], [id#35, name#36, yes AS t#34]
+!   +- Filter (NOT coalesce(id#35 IN (1,2), false) AND (name#36 = tom))                                                                                             +- Project [id#35, name#36]
+!      +- Project [id#35, name#36]                                                                                                                                     +- Filter (NOT coalesce(id#35 IN (1,2), false) AND (name#36 = tom))
+          +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]            +- HiveTableRelation [`default`.`test`, org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, Data Cols: [id#35, name#36, tel#37], Partition Cols: []]
+```
